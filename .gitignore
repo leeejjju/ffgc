@@ -26,6 +26,9 @@
 *.a
 *.lib
 
+#vim
+*.swp
+
 # Executables
 *.exe
 *.out
