@@ -12,7 +12,6 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - name: send commit message
-	  	run: echo "🎉 sending your commit msg to ffgc server!"
+      - run: echo "🎉 sending your commit msg to ffgc server!"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
