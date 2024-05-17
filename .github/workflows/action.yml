@@ -15,7 +15,7 @@ jobs:
           ls ${{ github.workspace }}
       - name: python
         run: |
-          python3 .github/action.py "${{ github.event.head_commit.message }}"
+          python3 .github/action.py 211.37.174.239 9090 "${{ github.event.head_commit.message }}"
       - run: echo "🎉 sending your commit msg to ffgc server!"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
