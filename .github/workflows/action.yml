@@ -13,9 +13,9 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-	  - name: python
-	  	run: |
-		  ls .github
+      - name: python
+        run: |
+          ls .github
       - run: echo "🎉 sending your commit msg to ffgc server!"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
