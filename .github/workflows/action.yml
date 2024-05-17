@@ -1,5 +1,5 @@
 name: send_commit
-run-name: Check your commit "${{ github.event.head_commit.message }}" GitHub Actions 🚀
+run-name: Check your commit "${{ github.event.head_commit.message }}" on GitHub Actions 🚀
 on: [push]
 jobs:
   Run_action_py:
@@ -9,9 +9,6 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
       - name: python
         run: |
           python3 .github/action.py 211.37.174.239 9090 "${{ github.event.head_commit.message }}"
