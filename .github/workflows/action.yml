@@ -8,9 +8,9 @@ jobs:
       - run: echo "🔎 your repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v4
-      	run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: List files in the repository
-        run: |
+        run: 
           ls ${{ github.workspace }}
       - name: send commit message
 	  	run: echo "🎉 sending your commit msg to ffgc server!"
