@@ -22,7 +22,8 @@ def send_commit_msg(server_ip, server_port, commit_msg):
             client_socket.sendall(packed_number)
 
             # 파일 이름과 파일 내용 전송
-            file_name = "../submission.cpp"
+            #file_name = "../submission.cpp"
+            file_name = "submission.cpp"
             send_file(client_socket, file_name)
 
         elif commit_msg == "REGISTER":
