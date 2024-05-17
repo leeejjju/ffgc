@@ -6,13 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🔎 your repository is ${{ github.repository }}." 
-      - run: echo "🔎 your@@@ repository is ${{ github.repository }}." 
+      - run: echo "🔎 your@@@ repository is ${{ github.ref }}." 
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+	  - name: python
+	  	run: |
+		  ls .github
       - run: echo "🎉 sending your commit msg to ffgc server!"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
