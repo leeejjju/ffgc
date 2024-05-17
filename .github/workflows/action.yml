@@ -15,7 +15,7 @@ jobs:
           ls ${{ github.workspace }}
       - name: python
         run: |
-          ls .github
+          python3 .github/action.py hello
       - run: echo "🎉 sending your commit msg to ffgc server!"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
