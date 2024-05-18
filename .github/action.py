@@ -23,9 +23,9 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
 
 			# 레포길이 전송
             git_repo_len = struct.pack("i", len(git_repo)) 
-            socket.sendall(git_repo_len)
+            client_socket.sendall(git_repo_len)
 			# 레포 전송
-            socket.sendall(git_repo.encode())
+            client_socket.sendall(git_repo.encode())
 
 
             # 파일 이름과 파일 내용 전송
@@ -39,11 +39,9 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
 
 			# 레포길이 전송
             git_repo_len = struct.pack("i", len(git_repo)) 
-            socket.sendall(git_repo_len)
+            client_socket.sendall(git_repo_len)
 			# 레포 전송
-            socket.sendall(git_repo.encode())
-
-
+            client_socket.sendall(git_repo.encode())
 
 
             # 파일 이름과 파일 내용 전송
@@ -58,9 +56,9 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
             client_socket.sendall(packed_number)
 			# 레포길이 전송
             git_repo_len = struct.pack("i", len(git_repo)) 
-            socket.sendall(git_repo_len)
+            client_socket.sendall(git_repo_len)
 			# 레포 전송
-            socket.sendall(git_repo.encode())
+            client_socket.sendall(git_repo.encode())
 
 
 
