@@ -22,10 +22,10 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
             client_socket.sendall(packed_number)
 
 			# 레포길이 전송
-    		git_repo_len = struct.pack("i", len(git_repo)) 
-		    socket.sendall(git_repo_len)
+            git_repo_len = struct.pack("i", len(git_repo)) 
+            socket.sendall(git_repo_len)
 			# 레포 전송
-    		socket.sendall(git_repo.encode())
+            socket.sendall(git_repo.encode())
 
 
             # 파일 이름과 파일 내용 전송
@@ -36,11 +36,14 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
             # 0을 4바이트로 패킹하여 전송
             packed_number = struct.pack("i", 0)
             client_socket.sendall(packed_number)
+
 			# 레포길이 전송
-    		git_repo_len = struct.pack("i", len(git_repo)) 
-		    socket.sendall(git_repo_len)
+            git_repo_len = struct.pack("i", len(git_repo)) 
+            socket.sendall(git_repo_len)
 			# 레포 전송
-    		socket.sendall(git_repo.encode())
+            socket.sendall(git_repo.encode())
+
+
 
 
             # 파일 이름과 파일 내용 전송
@@ -54,10 +57,11 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
             packed_number = struct.pack("i", -1)
             client_socket.sendall(packed_number)
 			# 레포길이 전송
-    		git_repo_len = struct.pack("i", len(git_repo)) 
-		    socket.sendall(git_repo_len)
+            git_repo_len = struct.pack("i", len(git_repo)) 
+            socket.sendall(git_repo_len)
 			# 레포 전송
-    		socket.sendall(git_repo.encode())
+            socket.sendall(git_repo.encode())
+
 
 
         else:
