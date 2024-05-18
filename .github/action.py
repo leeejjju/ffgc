@@ -99,7 +99,7 @@ def main():
     server_ip = sys.argv[1]
     server_port = int(sys.argv[2])
     commit_msg = sys.argv[3]
-	git_repo = sys.argv[4]
+    git_repo = sys.argv[4]
 
     send_commit_msg(server_ip, server_port, commit_msg, git_repo)
 
