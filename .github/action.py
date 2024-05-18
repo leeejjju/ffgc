@@ -3,7 +3,7 @@ import struct
 import sys
 
 
-def send_commit_msg(server_ip, server_port, commit_msg):
+def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
     # 소켓 생성
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -21,6 +21,13 @@ def send_commit_msg(server_ip, server_port, commit_msg):
             packed_number = struct.pack("i", number)
             client_socket.sendall(packed_number)
 
+			# 레포길이 전송
+    		git_repo_len = struct.pack("i", len(git_repo)) 
+		    socket.sendall(git_repo_len)
+			# 레포 전송
+    		socket.sendall(git_repo.encode())
+
+
             # 파일 이름과 파일 내용 전송
             file_name = "submission.cpp"
             send_file(client_socket, file_name)
@@ -29,6 +36,12 @@ def send_commit_msg(server_ip, server_port, commit_msg):
             # 0을 4바이트로 패킹하여 전송
             packed_number = struct.pack("i", 0)
             client_socket.sendall(packed_number)
+			# 레포길이 전송
+    		git_repo_len = struct.pack("i", len(git_repo)) 
+		    socket.sendall(git_repo_len)
+			# 레포 전송
+    		socket.sendall(git_repo.encode())
+
 
             # 파일 이름과 파일 내용 전송
             file_name = "test_driver.cpp"
@@ -40,6 +53,12 @@ def send_commit_msg(server_ip, server_port, commit_msg):
             # -1을 4바이트로 패킹하여 전송
             packed_number = struct.pack("i", -1)
             client_socket.sendall(packed_number)
+			# 레포길이 전송
+    		git_repo_len = struct.pack("i", len(git_repo)) 
+		    socket.sendall(git_repo_len)
+			# 레포 전송
+    		socket.sendall(git_repo.encode())
+
 
         else:
             print("not a valid commit msg. abort.")
@@ -69,15 +88,16 @@ def send_file(socket, file_name):
 
 
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: python client.py <IP> <PORT> <MESSAGE>")
+    if len(sys.argv) != 5:
+        print("Usage: python client.py <IP> <PORT> <MESSAGE> <GIT_REPO>")
         return
 
     server_ip = sys.argv[1]
     server_port = int(sys.argv[2])
     commit_msg = sys.argv[3]
+	git_repo = sys.argv[4]
 
-    send_commit_msg(server_ip, server_port, commit_msg)
+    send_commit_msg(server_ip, server_port, commit_msg, git_repo)
 
 
 if __name__ == "__main__":
