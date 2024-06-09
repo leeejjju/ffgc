@@ -40,7 +40,7 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
             file_name = "solution.cpp"
             send_file(client_socket, file_name)
 			#seed 전송 
-            for root, _, files in os.walk("seeds"):
+            for root, _, files in os.walk("inputs"):
                 for file in files:
                     send_file(client_socket, file)
 
