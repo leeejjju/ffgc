@@ -4,31 +4,67 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <iostream>
-#include <fstream>
 #include <sstream>
-#include <string>
 #include "db_stack.h"
 
 using namespace std;
 
 
-// if input doesn't meet condition return 1, otherwise return 0
+int solution_report_mode, log_mode;
+int log_fd;         // for log
+char log_file[128]; // for log
+int ok_fd;          // for solution_report
+char ok_file[128];  // for solution_report
+int total_input = 0, total_rep = 0, input_pass = 0, input_fail = 0, rep_pass = 0, rep_fail = 0;     // for solution report
+
+void exit_routine(int state);
+int input_ok(char * ch);
+int rep_ok(int before_size, int after_size, int rep_mode);
+void write_log(char * log_buf);
+void print_stack(Node * p);
+int write_ok_report();
+
+
+// state 0 : input_ok failed, state 1 : rep_ok failed
+void exit_routine(int state) {
+    if (log_mode == 1) {    
+        remove(log_file);
+        close (log_fd);
+    }
+
+    // update the variable
+    if (state == 0) {
+        total_input++;
+        input_fail++;
+    } else if (state == 1) {
+        total_rep++;
+        rep_fail++;
+    }
+
+    if (write_ok_report() == 1) {
+        remove(ok_file);
+    }
+
+    exit(state);
+}
+
+
+// if input doesn't meet condition call exit_routine, otherwise return 0
 // check if the input meets condition
 int input_ok(char * ch) {
     if (!isdigit((unsigned char)*ch)) {
-        return 1; // Return false if character is not digit
+        exit_routine(0);    // Call exit_routine if character is not digit
     }
     return 0;
 }
 
-// if the struct isn't correct return 1, otherwise return 0
+// if the struct isn't correct call exit_routine, otherwise return 0
 // check if the struct is correct
 // mode: push(0)/pop(1), before_size: before size of execute mode, after_size: after size of execute mode
 int rep_ok(int before_size, int after_size, int rep_mode) {
     if (rep_mode == 0) {    // push order
         if ((before_size + 1) != after_size) {
-            return 1;
+            exit_routine(1);
         }
     }
     else {      // pop order
@@ -36,7 +72,7 @@ int rep_ok(int before_size, int after_size, int rep_mode) {
             return 0;
         }
         if ((before_size - 1) != after_size) {
-            return 1;
+            exit_routine(1);
         }
     }
     
@@ -44,7 +80,7 @@ int rep_ok(int before_size, int after_size, int rep_mode) {
 }
 
 // record the function flow
-void write_log(int log_mode, int fd, char * log_buf) {
+void write_log(char * log_buf) {
     if (log_mode == 0) {
         return;
     }
@@ -53,7 +89,7 @@ void write_log(int log_mode, int fd, char * log_buf) {
     ssize_t written = 0, written_acc = 0;
 
     while (written_acc != log_len) {
-        written = write(fd, log_buf + written_acc, log_len - written_acc);
+        written = write(log_fd, log_buf + written_acc, log_len - written_acc);
         written_acc += written;
     }
 }
@@ -74,7 +110,7 @@ void print_stack(Node * p) {
 // This function is called in the following cases:
 // (1) Before exit_failure is executed due to a fail in either input_ok or rep_ok.
 // (2) Before normal termination in main after both input_ok and rep_ok have passed.
-int write_ok_report(int solution_report_mode, int ok_fd, int total_input, int total_rep, int input_pass, int input_fail, int rep_pass, int rep_fail) {
+int write_ok_report() {
     if (solution_report_mode == 0) {
         return 0;
     }
@@ -103,9 +139,6 @@ int write_ok_report(int solution_report_mode, int ok_fd, int total_input, int to
         }
         written_acc += written;
     }
-    
-    // why...?
-    write(ok_fd, " ", 2);
 
     close (ok_fd);
 
@@ -118,8 +151,8 @@ int main(int argc, char * argv[]) {
     // Save the Mode received as an argv[]
     // argv[1] : solution_report mode, argv[2] : log mode
     // 0 : turn off, 1: turn on
-    int solution_report_mode = atoi(argv[1]);
-    int log_mode = atoi(argv[2]);
+    solution_report_mode = atoi(argv[1]);
+    log_mode = atoi(argv[2]);
 
     Node * stack = nullptr;
 
@@ -130,24 +163,19 @@ int main(int argc, char * argv[]) {
     // printf("len: %ld\n", strlen(buf));
 
     int before_size;    // for rep_ok
-    char log_file[128]; // for log
     char log_buf[512];  // for log
-    int fd;             // for log
-    char ok_file[128];  // for solution_report
-    int ok_fd;           // for solution_report
-    int total_input = 0, total_rep = 0, input_pass = 0, input_fail = 0, rep_pass = 0, rep_fail = 0;     // for solution report
-
     
-    /* for log*/   
+    /* for log */   
     if (log_mode == 1) {    
         pid_t pid = getpid();
         sprintf(log_file, "./.log/log_%d", pid);
-        fd = open(log_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1) {
+        log_fd = open(log_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (log_fd == -1) {
             exit(EXIT_FAILURE);
         }
     }
     /* for log */
+
 
     /* for saving input_ok, rep_ok return value */
     if (solution_report_mode == 1) {
@@ -169,51 +197,30 @@ int main(int argc, char * argv[]) {
                 }
 
                 // check input is correct
-                if (input_ok(ch) == 1) {
-                    if (log_mode == 1) {    
-                        remove(log_file);
-                        close (fd);
-                    }
-                    // update solution_report info
-                    total_input++;
-                    input_fail++;
-                    // write ok_result
-                    if (write_ok_report(solution_report_mode, ok_fd, total_input, total_rep, input_pass, input_fail, rep_pass, rep_fail) == 1) {
-                        remove(ok_file);
-                    }
+                if (input_ok(ch) != 0) {
                     exit(EXIT_FAILURE);
                 }
-
                 // update solution_report info
                 total_input++;
                 input_pass++;
+
 
                 before_size = stack_size(stack);
                 stack = stack_push(stack, *ch);
 
                 // record log
                 sprintf(log_buf, "stack Pushed\n");
-                write_log(log_mode, fd, log_buf);
+                write_log(log_buf);
                 
+
                 // check struct 
-                if ((rep_ok(before_size, stack_size(stack), 0)) == 1) {
-                    if (log_mode == 1) {    
-                        remove(log_file);
-                        close (fd);
-                    }
-                    // update solution_report info
-                    total_rep++;
-                    rep_fail++;
-                    // write ok_result
-                    if (write_ok_report(solution_report_mode, ok_fd, total_input, total_rep, input_pass, input_fail, rep_pass, rep_fail) == 1) {
-                        remove(ok_file);
-                    }
+                if ((rep_ok(before_size, stack_size(stack), 0)) != 0) {
                     exit(EXIT_FAILURE);
                 }
-
                 // update solution_report info
                 total_rep++;
                 rep_pass++;
+
 
                 print_stack(stack);
                 break;
@@ -224,27 +231,17 @@ int main(int argc, char * argv[]) {
 
                 // record log
                 sprintf(log_buf, "Popping from stack\n");
-                write_log(log_mode, fd, log_buf);
+                write_log(log_buf);
+
 
                 // check struct 
-                if ((rep_ok(before_size, stack_size(stack), 1)) == 1) {
-                    if (log_mode == 1) {    
-                        remove(log_file);
-                        close (fd);
-                    }
-                    // update solution_report info
-                    total_rep++;
-                    rep_fail++;
-                    // write ok_result
-                    if (write_ok_report(solution_report_mode, ok_fd, total_input, total_rep, input_pass, input_fail, rep_pass, rep_fail) == 1) {
-                        remove(ok_file);
-                    }
+                if ((rep_ok(before_size, stack_size(stack), 1)) != 0) {
                     exit(EXIT_FAILURE);
                 }
-
                 // update solution_report info
                 total_rep++;
                 rep_pass++;
+                
 
                 print_stack(stack);
                 break;
@@ -261,13 +258,11 @@ int main(int argc, char * argv[]) {
     stack_clear(stack);
 
 
-    if (solution_report_mode == 1) {    
-        // write ok_result
-        if (write_ok_report(solution_report_mode, ok_fd, total_input, total_rep, input_pass, input_fail, rep_pass, rep_fail) == 1) {
-            remove(ok_file); 
-        }
+    // write ok_result
+    if (write_ok_report() == 1) {
+        remove(ok_file); 
     }
     if (log_mode == 1) {  
-        close (fd);
+        close (log_fd);
     }
 }
