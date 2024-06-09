@@ -42,7 +42,8 @@ def send_commit_msg(server_ip, server_port, commit_msg, git_repo):
 			#seed 전송 
             for root, _, files in os.walk("inputs"):
                 for file in files:
-                    send_file(client_socket, file)
+                    print(file)
+                    send_file(client_socket, "inputs/"+file)
 
         elif commit_msg == "FINISH":
             # -1을 4바이트로 패킹하여 전송
